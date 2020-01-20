@@ -3,18 +3,19 @@ import { Field, Form } from "react-final-form";
 import FormInput from "../FormInput";
 import "./index.scss";
 import CustomButton from "../CustomButton";
-import { signInWithGoogle, auth } from "../../../firebase";
+import { connect } from "react-redux";
+import {
+  signInWithGoogleStart,
+  signInWithEmailStart
+} from "../../../redux/user/actions";
 
-const SignIn = () => (
+const SignIn = ({ signInWithGoogleStart, signInWithEmailStart }) => (
   <div className="sign-in">
     <h2>I already have an account</h2>
     <span>Sign in with your email and password</span>
     <Form
       onSubmit={async values => {
-        const { email, password } = values;
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-        } catch (error) {}
+        signInWithEmailStart(values);
       }}
       render={({ handleSubmit, form }) => (
         <form onSubmit={e => handleSubmit(e).then(form.reset)}>
@@ -32,7 +33,11 @@ const SignIn = () => (
           />
           <div className="buttons">
             <CustomButton type="submit">SIGN IN</CustomButton>
-            <CustomButton onClick={signInWithGoogle} isGoogleSignIn>
+            <CustomButton
+              type="button"
+              onClick={signInWithGoogleStart}
+              isGoogleSignIn
+            >
               SIGN IN WITH GOOGLE
             </CustomButton>
           </div>
@@ -41,4 +46,6 @@ const SignIn = () => (
     />
   </div>
 );
-export default SignIn;
+export default connect(null, { signInWithGoogleStart, signInWithEmailStart })(
+  SignIn
+);

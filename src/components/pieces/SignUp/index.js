@@ -2,31 +2,23 @@ import React from "react";
 import { Form, Field } from "react-final-form";
 import FormInput from "../FormInput";
 import CustomButton from "../CustomButton";
-import { auth, createUserProfileDocument } from "../../../firebase";
+import { connect } from "react-redux";
+import { signUpStart } from "../../../redux/user/actions";
 import "./index.scss";
 
-const SignUp = () => (
+const SignUp = ({ signUpStart }) => (
   <div className="sign-up">
     <h2 className="title">I do not have an account</h2>
     <span>Sign up with your email and password</span>
 
     <Form
       onSubmit={async values => {
-        if (values.password !== values.confirmPassword) {
+        const { password, confirmPassword, displayName, email } = values;
+        if (password !== confirmPassword) {
           alert(`Passwords don't match`);
           return;
         }
-        try {
-          const { user } = await auth.createUserWithEmailAndPassword(
-            values.email,
-            values.password
-          );
-          await createUserProfileDocument(user, {
-            displayName: values.displayName
-          });
-        } catch (error) {
-          console.log(error.message);
-        }
+        signUpStart({ email, password, displayName });
       }}
       render={({ handleSubmit, form: { reset } }) => (
         <form
@@ -63,4 +55,4 @@ const SignUp = () => (
     />
   </div>
 );
-export default SignUp;
+export default connect(null, { signUpStart })(SignUp);

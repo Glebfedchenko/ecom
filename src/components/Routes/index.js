@@ -6,27 +6,14 @@ import Header from "../pieces/Header";
 import CheckoutPage from "../pages/CheckoutPage";
 import SignInSignUpPage from "../pages/SignInSignUpPage";
 import { connect } from "react-redux";
-import { setCurrentUser } from "../../redux/user/actions";
-import { auth, createUserProfileDocument } from "../../firebase";
 import { createStructuredSelector } from "reselect";
 import { selectCurrentUser } from "../../redux/user/selectors";
+import { checkUserSession } from "../../redux/user/actions";
 
-const Routes = ({ setCurrentUser, currentUser }) => {
+const Routes = ({ setCurrentUser, currentUser, checkUserSession }) => {
   useEffect(() => {
-    const unsubscribeFromAuth = auth.onAuthStateChanged(
-      async userAuthObject => {
-        if (userAuthObject) {
-          const userRef = await createUserProfileDocument(userAuthObject);
-          userRef.onSnapshot(snapshot =>
-            setCurrentUser({ id: snapshot.id, ...snapshot.data() })
-          );
-        } else setCurrentUser(userAuthObject);
-      }
-    );
-    return () => {
-      unsubscribeFromAuth();
-    };
-  }, [setCurrentUser]);
+    checkUserSession();
+  }, [checkUserSession, setCurrentUser]);
   return (
     <>
       <Header />
@@ -47,5 +34,5 @@ const Routes = ({ setCurrentUser, currentUser }) => {
 };
 export default connect(
   createStructuredSelector({ currentUser: selectCurrentUser }),
-  { setCurrentUser }
+  { checkUserSession }
 )(Routes);
